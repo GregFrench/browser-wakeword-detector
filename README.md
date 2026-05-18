@@ -1,7 +1,6 @@
-# Wakeword Door Detector
+# Browser Wake Word Detector
 
-A dependency-free browser app that listens for the phrase `open the door` and
-updates the page when it hears it.
+A browser app that demonstrates wake word detection using the Web Speech API by listening for the phrase "open the door" and updating the page state when it hears it.
 
 ## Run
 
