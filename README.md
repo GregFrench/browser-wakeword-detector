@@ -19,21 +19,6 @@ http://localhost:5173
 Press **Start listening**, allow microphone access, and say `open the door`.
 After the door opens, say `close the door` to close it again.
 
-## Deploy to GitHub Pages
-
-This app can be hosted directly from the repository root.
-
-1. Open `https://github.com/GregFrench/browser-wakeword-detector/settings/pages`.
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-3. Select branch `main` and folder `/ (root)`.
-4. Click **Save**.
-
-The site will publish at:
-
-```text
-https://gregfrench.github.io/browser-wakeword-detector/
-```
-
 ## Browser support
 
 The app uses the browser Web Speech Recognition API. It works best in Chrome or
