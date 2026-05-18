@@ -11,9 +11,9 @@
       <section class="detector" aria-labelledby="app-title">
         <div class="status-copy">
           <p class="eyebrow">Browser wakeword detector</p>
-          <h1 id="app-title">Listening for "open the door"</h1>
+          <h1 id="app-title">Voice controlled door</h1>
           <p class="lead">
-            Start the microphone, say the phrase, and the activation state will update here.
+            Start the microphone, then say "open the door" or "close the door."
           </p>
 
           <div class="controls" aria-label="Detector controls">
@@ -21,7 +21,7 @@
               <span aria-hidden="true">&#9654;</span>
               Start listening
             </button>
-            <button class="icon-button" id="resetButton" type="button" aria-label="Reset activation">
+            <button class="icon-button" id="resetButton" type="button" aria-label="Reset door state">
               &#8634;
             </button>
           </div>
@@ -55,9 +55,9 @@
           <p class="transcript" id="transcript">No speech captured yet.</p>
         </div>
         <div class="readout-block">
-          <p class="readout-label">Activation log</p>
+          <p class="readout-label">Door command log</p>
           <ol class="activation-log" id="activationLog">
-            <li>No activations yet.</li>
+            <li>No door commands yet.</li>
           </ol>
         </div>
       </section>

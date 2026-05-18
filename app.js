@@ -1,5 +1,9 @@
-const WAKE_PHRASE = "open the door";
+const COMMANDS = [
+  { action: "open", phrase: "open the door", state: "Door open" },
+  { action: "close", phrase: "close the door", state: "Door closed" },
+];
 const MAX_BUFFER_WORDS = 18;
+const COMMAND_HELP = COMMANDS.map(({ phrase }) => `"${phrase}"`).join(" or ");
 
 const startButton = document.querySelector("#startButton");
 const resetButton = document.querySelector("#resetButton");
@@ -17,8 +21,9 @@ let recognition;
 let isListening = false;
 let shouldRestart = false;
 let recentWords = [];
-let activationCount = 0;
-let lastActivationAt = 0;
+let commandCount = 0;
+let lastCommandAt = 0;
+let lastCommandAction = "";
 
 function normalizeSpeech(value) {
   return value
@@ -28,9 +33,26 @@ function normalizeSpeech(value) {
     .trim();
 }
 
-function phraseWasHeard(value) {
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function heardCommand(value) {
   const normalized = normalizeSpeech(value);
-  return new RegExp(`\\b${WAKE_PHRASE}\\b`).test(normalized);
+  let match;
+
+  for (const command of COMMANDS) {
+    const phrasePattern = new RegExp(`\\b${escapeRegExp(command.phrase)}\\b`, "g");
+    let phraseMatch;
+
+    while ((phraseMatch = phrasePattern.exec(normalized)) !== null) {
+      if (!match || phraseMatch.index > match.phraseIndex) {
+        match = { ...command, phraseIndex: phraseMatch.index };
+      }
+    }
+  }
+
+  return match;
 }
 
 function pushRecentWords(value) {
@@ -55,50 +77,53 @@ function setSupportMessage(message, tone = "warning") {
   supportMessage.dataset.tone = tone;
 }
 
-function renderActivationLog(timeLabel) {
-  if (activationCount === 1) {
+function renderCommandLog(command, timeLabel) {
+  if (commandCount === 1) {
     activationLog.textContent = "";
   }
 
   const item = document.createElement("li");
-  item.textContent = `Activation ${activationCount} at ${timeLabel}`;
+  item.textContent = `${command.state} at ${timeLabel}`;
   activationLog.prepend(item);
 }
 
-function activateDoor() {
-  const activatedAt = Date.now();
+function runDoorCommand(command) {
+  const commandAt = Date.now();
 
-  if (activatedAt - lastActivationAt < 2500) {
+  if (
+    command.action === lastCommandAction &&
+    commandAt - lastCommandAt < 2500
+  ) {
     return;
   }
 
-  lastActivationAt = activatedAt;
-  activationCount += 1;
+  lastCommandAt = commandAt;
+  lastCommandAction = command.action;
+  commandCount += 1;
   const timeLabel = new Intl.DateTimeFormat(undefined, {
     hour: "numeric",
     minute: "2-digit",
     second: "2-digit",
   }).format(new Date());
 
-  doorCard.classList.add("is-activated");
-  setDetectorState("Activated", `"${WAKE_PHRASE}" heard at ${timeLabel}.`);
-  renderActivationLog(timeLabel);
+  doorCard.classList.toggle("is-activated", command.action === "open");
+  setDetectorState(command.state, `"${command.phrase}" heard at ${timeLabel}.`);
+  renderCommandLog(command, timeLabel);
 }
 
-function resetActivation() {
-  activationCount = 0;
-  lastActivationAt = 0;
+function resetDoor() {
+  commandCount = 0;
+  lastCommandAt = 0;
+  lastCommandAction = "";
   recentWords = [];
   doorCard.classList.remove("is-activated");
-  activationLog.innerHTML = "<li>No activations yet.</li>";
+  activationLog.innerHTML = "<li>No door commands yet.</li>";
   transcript.textContent = isListening
     ? "Listening for speech..."
     : "No speech captured yet.";
   setDetectorState(
     isListening ? "Listening" : "Standby",
-    isListening
-      ? `Say "${WAKE_PHRASE}" to activate.`
-      : "Waiting for microphone access.",
+    isListening ? `Say ${COMMAND_HELP}.` : "Waiting for microphone access.",
   );
 }
 
@@ -127,8 +152,10 @@ function handleResult(event) {
     transcript.textContent = combinedText;
   }
 
-  if (phraseWasHeard(combinedText)) {
-    activateDoor();
+  const command = heardCommand(combinedText);
+
+  if (command) {
+    runDoorCommand(command);
     recentWords = [];
   }
 }
@@ -162,7 +189,7 @@ function configureRecognition() {
     doorCard.classList.add("is-listening");
     setButtonState();
     setSupportMessage("Microphone is active.", "ok");
-    setDetectorState("Listening", `Say "${WAKE_PHRASE}" to activate.`);
+    setDetectorState("Listening", `Say ${COMMAND_HELP}.`);
     transcript.textContent = "Listening for speech...";
   });
 
@@ -208,7 +235,7 @@ function configureRecognition() {
 }
 
 function initialize() {
-  resetButton.addEventListener("click", resetActivation);
+  resetButton.addEventListener("click", resetDoor);
 
   if (!SpeechRecognition) {
     startButton.disabled = true;
@@ -234,3 +261,11 @@ function initialize() {
 }
 
 initialize();
+
+if (new URLSearchParams(window.location.search).has("test")) {
+  window.__doorDetectorTest = {
+    heardCommand,
+    runDoorCommand,
+    resetDoor,
+  };
+}

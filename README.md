@@ -1,6 +1,6 @@
 # Browser Wake Word Detector
 
-A browser app that demonstrates wake word detection using the Web Speech API by listening for the phrase "open the door" and updating the page state when it hears it.
+A browser app that demonstrates wake word detection using the Web Speech API by listening for "open the door" and "close the door", then updating the page state when it hears either phrase.
 
 ## Run
 
@@ -17,6 +17,7 @@ http://localhost:5173
 ```
 
 Press **Start listening**, allow microphone access, and say `open the door`.
+After the door opens, say `close the door` to close it again.
 
 ## Browser support
 
