@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wakeword Door Detector</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="detector" aria-labelledby="app-title">
+        <div class="status-copy">
+          <p class="eyebrow">Browser wakeword detector</p>
+          <h1 id="app-title">Listening for "open the door"</h1>
+          <p class="lead">
+            Start the microphone, say the phrase, and the activation state will update here.
+          </p>
+
+          <div class="controls" aria-label="Detector controls">
+            <button class="primary-button" id="startButton" type="button">
+              <span aria-hidden="true">&#9654;</span>
+              Start listening
+            </button>
+            <button class="icon-button" id="resetButton" type="button" aria-label="Reset activation">
+              &#8634;
+            </button>
+          </div>
+
+          <p class="support-message" id="supportMessage" role="status"></p>
+        </div>
+
+        <div class="door-stage" aria-live="polite">
+          <div class="door-card" id="doorCard">
+            <div class="door-visual" aria-hidden="true">
+              <div class="door-frame">
+                <div class="door-panel">
+                  <span class="door-knob"></span>
+                </div>
+                <div class="door-light"></div>
+              </div>
+            </div>
+
+            <div class="activation-panel">
+              <p class="state-label">Current state</p>
+              <strong id="activationState">Standby</strong>
+              <span id="activationDetail">Waiting for microphone access.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="readout" aria-label="Speech recognition readout">
+        <div class="readout-block">
+          <p class="readout-label">Live transcript</p>
+          <p class="transcript" id="transcript">No speech captured yet.</p>
+        </div>
+        <div class="readout-block">
+          <p class="readout-label">Activation log</p>
+          <ol class="activation-log" id="activationLog">
+            <li>No activations yet.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
